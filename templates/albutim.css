@@ -1,0 +1,337 @@
+@charset "utf-8";
+
+/* Common styles */
+
+body {
+	font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+	font-size: 13px;
+	margin: 0px;
+	padding: 10px 20px;
+}
+
+
+html,body { height: 100%; margin: 0px; padding: 0px; }
+#full { /*background: #0f0;*/ height: 100%; padding:20px; padding-bottom:0px; padding-top:0px; }
+
+
+a:link,
+a:visited,
+a:active,
+a:hover {
+	text-decoration: none;
+	outline: none;
+}
+
+img {
+	border: 0;
+}
+
+.thumb-container {
+    border-width: 1px;
+    /*border-style: dashed;*/
+}
+
+h1 {
+	font-size: 1.8em;
+	font-weight: bold;
+	margin: 10px;
+	letter-spacing: 4px;
+}
+
+h2 {
+	font-size: 1.2em;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 4px;
+	margin: 10px;
+}
+
+p {	margin: 0; }
+.clearer { clear: both; }
+.float-right {	float: right; }
+.float-left { float: left; }
+.center { text-align: center; }
+
+.border, .box {
+    border-width: 1px;
+    border-style: solid;
+}
+
+.box {
+	opacity: 0.6;
+    	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+	filter:alpha(opacity:60);
+	padding: 5px;
+	margin: 0;
+	background-color: #333;
+	color: #fff;
+}
+
+.label {
+  width:126px;
+	position: absolute;
+	top: 9px;
+	left: 9px;
+	opacity: 0.6;
+    	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+	filter:alpha(opacity:80);
+	background: #333;
+	color: #fff;
+	font-size: 0.7em;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+	/*padding: 4px;*/
+}
+
+#header {
+	/*text-align: center;*/
+  padding-left: 25px;
+}
+
+#content {
+	margin: 10px 20px 20px 20px;
+}
+
+#footer {
+	font-size: 0.8em;
+	padding: 5px;
+	margin-right: 25px;
+
+}
+
+.thumb-container {
+	position: relative;
+	padding: 8px;
+	display: block;
+	cursor: pointer;
+}
+
+/** html .thumb-container {
+	height: 1px;
+}*/
+
+/* Index styles */
+
+#thumb-navigation {
+	margin: 0 auto;
+}
+
+.thumb-container {
+	margin: 10px 10px 0 0;
+}
+
+/* Style specific styles */
+
+body {
+	color: #888;
+	background: #000;
+}
+
+a:link,
+a:visited {
+	color: #eee;
+}
+
+a:active,
+a:hover {
+	color: #ccc;
+}
+
+.border,
+.box {
+	border: none;
+}
+
+.thumb-container {
+	border-color:#000;
+}
+
+
+h2 {
+	color: #888;
+}
+
+.thumb-container:hover {
+	/*border-style:solid;
+	border-color:#fff;
+	background-color: #fff;*/
+  -webkit-filter:brightness(133%);
+  filter:brightness(133%);
+}
+
+
+.label {
+	left: 8px;
+	top: 8px;
+}
+
+#content {
+	margin: 0 0 20px 0;
+}
+
+#footer {
+	padding: 5px 0 0 0;
+}
+
+
+/* jan */
+
+/* this should be on html, not #anything */
+#background-image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: -10;
+  display: block;
+  /*background-repeat: repeat-y;*/
+  /*background-size: 100% auto;*/
+  width: 100%;
+  height: 100%;
+  /*background: url(bg.jpg) no-repeat center center fixed;*/
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  -webkit-filter: blur(15px) grayscale(66%);
+  -moz-filter: blur(15px) grayscale(66%);
+  -o-filter: blur(15px) grayscale(66%);
+  -ms-filter: blur(15px) grayscale(66%);
+  filter: blur(15px) grayscale(66%);
+  transition: background 1s linear;
+}
+
+#stepnav-thumb-container {
+  position: fixed;
+  top:100px;
+  right:0px;
+  width:180px;
+  /*border:1px solid yellow;*/
+  display: none;
+  z-index: 100;
+}
+#stepnav-thumb-navigation span.label {
+  font-size:1em;
+  font-weight: bold;
+}
+
+#thumb-container {
+  display: none;
+  padding-left: 25px;
+}
+
+dl {
+  font-size:0.8em;
+}
+dt {
+  font-weight:bold;
+}
+dd {
+  margin:0;
+  color:#aaa;
+}
+
+h1 {
+  text-shadow: 2px 2px 5px #333;
+}
+
+.singlethumb-container {
+  width: 150px;
+  height: 105px;
+  /*border:10px solid red;*/
+  display: inline-block;
+  overflow: hidden;
+  float:left;
+  /*border: 1px solid red;*/
+}
+
+.singlethumb-container img {
+  text-align: center;
+  margin: 0 auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  clip-path: inset(0px 0px 30px 30px);
+  width:130px;
+  /*max-height:110px;*/
+  /*max-width:100px;*/
+  z-index:10;
+  /*border: 1px solid blue;*/
+}
+
+#footer {
+  position: fixed;
+  bottom:10px;
+  right:10px;
+  z-index:3;
+}
+
+#footer p a {
+  color:#ccc;
+}
+
+#info-button {
+  cursor:pointer;
+}
+
+#previmg, #nextimg {
+  margin-right: 25px;
+  border:none;
+  min-height:80px;
+  opacity: 0.33;
+  -webkit-filter:grayscale(50%);
+  filter:grayscale(50%);
+}
+
+#previmg:hover, #nextimg:hover {
+  opacity: 1;
+}
+
+#pimg, #nimg {
+  width:130px;
+}
+
+#subHeader {
+  text-shadow: 1px 1px 2px #333;
+}
+
+
+h1 {
+  float:left;
+  margin:15px;
+  font-size:16px;
+  padding:0;
+  line-height:40px;
+}
+h2 {
+  float:right;
+  margin:15px;
+  margin-right:25px;
+  font-size:14px;
+  padding:0;
+  line-height:40px;
+}
+
+#single-image-container {
+    margin:auto;
+    text-align: center;
+    height:85%;
+    /*border: 1px solid blue;*/
+}
+
+#single-image {
+    position: relative;
+    top: 50%;
+    transform: translate(0, -50%);
+    height:98%;
+    margin-left:-50px;
+}
+
+a.thumb-container img:hover {
+  -webkit-transform: rotate(5deg);
+  transform: rotate(5deg);
+  /* let's randomize direction via js? */
+}

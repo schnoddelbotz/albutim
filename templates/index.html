@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="initial-scale=1.0" />
+  <title>albutim</title>
+  <!--
+        "Simple" template | part of albutim
+        https://github.com/schnoddelbotz/albutim
+  -->
+  <link href="albutim.css" type="text/css" rel="stylesheet" />
+  <script src="jquery-2.2.2.min.js" type="text/javascript"></script>
+  <script src="albumdata.js" type="text/javascript"></script>
+  <script src="albutim.js" type="text/javascript"></script>
+</head>
+<body onhashchange="hashChanged()">
+<div id="full">
+  <div id="background-image"></div>
+	<div id="header" class="border">
+		<h1><a href="#/" id="headerAlbumTitle" title="Press ESC to return to main index"><!-- title --></a> » <a href="#/" id="headerFolderTitle" title="Press ↑ key to return to folder"><!-- folder --></a></h1>
+		<h2 id="subHeader">Loading... please wait</h2>
+	</div>
+  <div class="clearer"></div>
+  <!-- Container used for single image / preview display -->
+  <div id="single-image-container">
+   <!--<div class="center" style="">-->
+      <a id="single-image-link" href="#">
+        <img id="single-image" class="border" src="#" alt="Preview" title="Click for original">
+      </a>
+   <!--</div>-->
+  </div>
+	<div id="content" class="content">
+    <!-- PREVIOUS / NEXT -->
+    <div id="stepnav-thumb-container">
+      <div id="stepnav-thumb-navigation" class="float-right">
+        <a id="nextimg" href="#" class="thumb-container">
+          <img id="nimg" class="border" src="#" title="Press → key for next image">
+          <span class="label">→</span>
+        </a>
+        <a id="previmg" href="#" class="thumb-container">
+          <img id="pimg" class="border" src="#" title="Press ← key for previous image">
+          <span class="label">←</span>
+        </a>
+        <div class="clearer"></div>
+        <div style="">
+           <div id="image-info" class="box">
+            <p>Image Information</p>
+            <dl>
+              <dt>Date / Time</dt> <dd id="DateTime">7/2/11 6:xx?</dd>
+
+              <dt>Camera</dt> <dd id="Model">???</dd>
+
+              <dt>Aperture | EM | Flash</dt>
+              <dd>
+                <span id="FNum"></span> | <span id="ExposureMode">Auto exposure?</span> <br>
+                <span id="Flash">Flash did not fire?</span>
+              </dd>
+
+              <dt>Time | Bias | ISO</dt>
+              <dd>
+                <span id="ExposureTime"></span>s | <span id="ExposureBiasValue"></span>  | <span id="ISOSpeedRatings">4xx00?</span>
+              </dd>
+
+              <dt>FL | FL [35mm] | WB</dt>
+              <dd>
+                <span id="FocalLength"></span>mm |
+                <span id="FocalLengthIn35mmFilm"></span>mm |
+                <span id="WhiteBalance"></span>
+              </dd>
+
+              <dt>Resolution | Size</dt>
+              <dd>
+                <span id="ExifImageLength">123</span> x <span id="ExifImageWidth">777</span> |
+                <span id="FileSize">???</span>
+              </dd>
+
+            </dl>
+           </div>
+          </div>
+      </div>
+    </div>
+    <!-- Image / Folder browser comes here ... -->
+    <div id="thumb-container">
+			<div id="thumb-navigation">
+        Welcome. Please wait while page loads ...
+			</div>
+    </div>
+	</div>
+  <div class="clearer"></div>
+  <div id="footer" class="border">
+			<p>
+        <a id="info-button">| image information |</a>
+        album made with
+        <a href="https://github.com/schnoddelbotz/albutim" title="albutim 0">albutim</a>
+      </p>
+	</div>
+</div>
+</body>
+</html>
