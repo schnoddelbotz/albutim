@@ -1,4 +1,4 @@
-//go:generate esc -pkg lib -prefix "templates" -o lib/templates.go -private templates
+//go:generate esc -prefix assets/ -pkg lib -o lib/assets.go -private assets
 
 package main
 

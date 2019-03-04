@@ -2,25 +2,22 @@
 PLATFORMS = linux/amd64 darwin/amd64 windows/amd64 linux/arm
 
 VERSION = $(shell git describe --tags | cut -dv -f2)
-LDFLAGS := -X main.AppVersion=$(VERSION) -w
+LDFLAGS := -X github.com/schnoddelbotz/albutim/cmd.AppVersion=$(VERSION) -w
 
 all: albutim
 
-albutim: dependencies
+albutim:
 	go generate
 	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)"
 
 dependencies:
 	go get github.com/mjibson/esc
 
-
 clean:
-	rm -f albutim
+	rm -f albutim lib/assets.go
 
-# run: dashboard-nerf test_media
-# 	./dashboard-nerf -media test_media
-
-###
+run: clean albutim
+	./albutim serve --root testalbum
 
 release:
 	for platform in $(PLATFORMS); do \

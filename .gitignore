@@ -12,5 +12,6 @@
 *.out
 
 albutim
-lib/templates.go
+lib/assets.go
 .idea/
+testalbum/

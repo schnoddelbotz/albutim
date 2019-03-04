@@ -4,9 +4,13 @@ package cmd
 import (
 	"fmt"
 	"github.com/schnoddelbotz/albutim/lib"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
+
+var httpPort string
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -14,21 +18,16 @@ var serveCmd = &cobra.Command{
 	Short: "run the built-in webserver to serve your album",
 	Long: `Just try it`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
-		lib.DoStuff()
+		if _, err := os.Stat(albumRoot); os.IsNotExist(err) {
+			fmt.Printf("Album root directory '%s' does not exist!\n", albumRoot)
+			os.Exit(1)
+		}
+		albumRoot = filepath.Clean(albumRoot)
+		lib.Serve(albumRoot, httpPort)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	serveCmd.Flags().StringVar(&httpPort,"port", "3000", "HTTP port to serve on")
 }

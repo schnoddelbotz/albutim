@@ -12,12 +12,22 @@ var showImageInfo = false;
 var currentFolder;
 
 $(function() {
-  // previously via albumdata.json/xhr, now via <script src="albumdata.js"...>
-  albumImages = albumData.images;
-  albumTitle = albumData.title;
-  albumCreated = albumData.created;
-  albumSubtitle = albumData.subtitle;
-  initAlbum();
+  $.ajax({
+    url: "albumdata.json",
+    dataType: "json",
+    success: function(response) {
+      albumTitle = response.albumTitle;
+      // $.each(response.Users, function(item) {
+      //   informationArray.push(item);
+      // });
+      // informationArray.push("success");
+      initAlbum();
+    }
+  });
+  // albumImages = albumData.images;
+  // albumTitle = albumData.title;
+  // albumCreated = albumData.created;
+  // albumSubtitle = albumData.subtitle;
 });
 
 $(document).keydown(function( event ) {
@@ -68,6 +78,7 @@ function hashChanged() {
 }
 
 function initAlbum() {
+  console.log(albumTitle);
   document.title = albumTitle;
   $("#headerAlbumTitle").html(albumTitle);
   // analyze hashtag to route to image directly?
@@ -119,7 +130,12 @@ function getSubFolders(imgFolder) {
 }
 
 function showFolder(imgFolder) {
-  //console.log("Now showing folder: "+imgFolder);
+  console.log("Now showing folder: "+imgFolder);
+
+  // FIXME
+  return
+  // FIXME
+
   window.location.href = '#' + imgFolder;
   imgFolder = decodeURIComponent(imgFolder);
 
