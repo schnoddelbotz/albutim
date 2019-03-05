@@ -1,7 +1,7 @@
-
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -19,7 +19,13 @@ func Serve(albumRoot string, httpPort string) {
 
 func albumDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	fmt.Fprintf(w, `{"albumTitle":"FooTitle Bar"}`)
+	rootFolder := Folder{Parent: nil, Name: "/", Images: nil}
+	subFolder1 := Folder{Parent: &rootFolder, Name: "level1", Images: nil}
+	subFolder2 := Folder{Parent: &subFolder1, Name: "level2", Images: nil}
+	Folders := []Folder{rootFolder, subFolder1, subFolder2}
+	album := Album{Title: "My Album 1", Data: Folders}
+	json, _ := json.Marshal(album)
+	w.Write(json)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {

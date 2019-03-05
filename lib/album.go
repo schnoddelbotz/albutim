@@ -1,22 +1,47 @@
 package lib
 
-// Album doc
-type Image struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name" db:"name"`
-	Path        string  `json:"path" db:"path"`
-	//Tracks      []Track `json:"tracks"`
-	ArtistName  string  `json:"artist_name" db:"artist_name"`
-	ArtistCount int     `json:"artist_count" db:"artist_count"`
+type Album struct {
+	BackgroundImage string   `json:"backgroundImage"`
+	Title           string   `json:"title"`
+	SubTitle        string   `json:"subTitle"`
+	CreatedAt       string   `json:"createdAt"`
+	Data            []Folder `json:"data"`
 }
 
-// Albums doc
-type Album struct {
-	Error  string  `json:"error"`
-	Albums []Image `json:"albums"`
+type Folder struct {
+	Parent *Folder `json:"parent"`
+	Name   string  `json:"name"`
+	Images []Image `json:"images"`
+}
+
+// Album doc
+type Image struct {
+	Filename string `json:"filename"`
+	ExifData string `json:"exif"`
+}
+
+type ExifData struct {
+	DateTime              string
+	ExifImageLength       int
+	ExifImageWidth        int
+	ExposureBiasValue     int
+	ExposureMode          string
+	ExposureTime          string
+	FNum                  string
+	FNumber               string
+	FileSize              int
+	Flash                 string
+	FocalLength           string
+	FocalLengthIn35mmFilm int
+	ISOSpeedRatings       int
+	Model                 string
+	WhiteBalance          string
 }
 
 /*
+
+https://golang.org/pkg/path/filepath/#Walk
+https://stackoverflow.com/questions/12657365/extracting-directory-hierarchy-using-go-language
 
 {
   "background": null,
@@ -56,4 +81,4 @@ type Album struct {
   "title": "test"
 }
 
- */
+*/
