@@ -1,7 +1,9 @@
 package lib
 
 import (
+	"bytes"
 	"github.com/xor-gate/goexif2/exif"
+	"html/template"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,6 +17,7 @@ type Album struct {
 	CreatedAt       string `json:"createdAt"`
 	RootPath        string `json:"rootPath"`
 	Data            *Node  `json:"data"`
+	ServeStatically bool   `json:"serveStatically"`
 }
 
 type ExifData struct {
@@ -47,15 +50,15 @@ type Node struct {
 	ExifData ExifData `json:"exifdata,omitempty"`
 }
 
-func scanDir(root string) (result *Node, err error) {
-	// FIXME: re-add abspath...?
+func ScanDir(root string) (result *Node, err error) {
+	log.Print("Reading images...")
 	parents := make(map[string]*Node)
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		parents[path] = &Node{
-			FullPath: path,
+			FullPath: strings.TrimPrefix(path, root), //path,
 			Name:     info.Name(),
 			IsDir:    info.IsDir(),
 			Size:     info.Size(),
@@ -147,6 +150,20 @@ func _getExifData(fname string) (x *exif.Exif, err error) {
 		return nil, err
 	}
 	return x, nil
+}
+
+func renderIndexTemplate(data Album) []byte {
+	buf := &bytes.Buffer{}
+	templateBinary := _escFSMustByte(false, "/index.html")
+	tpl, err := template.New("index").Parse(string(templateBinary))
+	if err != nil {
+		log.Fatalf("Template parsing error: %v\n", err)
+	}
+	err = tpl.Execute(buf, data)
+	if err != nil {
+		log.Printf("Template execution error: %v\n", err)
+	}
+	return buf.Bytes()
 }
 
 /*

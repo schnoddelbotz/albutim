@@ -12,17 +12,12 @@ type server struct {
 	albumData Album
 }
 
-func Serve(albumRoot string, httpPort string) {
-	log.Print("Reading images...")
-	var err error
+//func Serve(albumRoot string, httpPort string) {
+func Serve(a Album, httpPort string) {
 	srv := new(server)
-	srv.albumData.Data, err = scanDir("testalbum")
-	if err != nil {
-		log.Fatalf("Cannot scan '%s': %s", albumRoot, err)
-	}
-
+	srv.albumData = a
 	http.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(_escFS(false))))
-	http.Handle("/originals/", http.StripPrefix("/originals", http.FileServer(http.Dir(albumRoot))))
+	http.Handle("/originals/", http.StripPrefix("/originals", http.FileServer(http.Dir(a.RootPath))))
 	http.HandleFunc("/thumbs/", srv.thumbHandler)
 	http.HandleFunc("/albumdata.json", srv.albumDataHandler)
 	http.HandleFunc("/", srv.indexHandler)
@@ -38,7 +33,7 @@ func (s *server) albumDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write(_escFSMustByte(false, "/index.html"))
+	w.Write(renderIndexTemplate(s.albumData))
 }
 
 func (s *server) thumbHandler(w http.ResponseWriter, r *http.Request) {

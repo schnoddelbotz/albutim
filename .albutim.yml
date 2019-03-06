@@ -1,0 +1,12 @@
+---
+
+# Example config file for an albutim album
+# It's automatically read from current directory or $HOME
+
+# Use it to avoid manually providing --FLAGs upon albutim invocation
+
+# --root : Image root foler. Use "." for current directory or an absolute path
+root: testalbum
+
+# --title : Your album title.
+title: My little test album

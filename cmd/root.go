@@ -12,12 +12,13 @@ import (
 var AppVersion string
 var cfgFile string
 var albumRoot string
+var albumTitle string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Version: AppVersion,
-	Use:   "albutim",
-	Short: "albutim is yet another photo album generator and server",
+	Use:     "albutim",
+	Short:   "albutim is yet another photo album generator and server",
 	Long: `Provided with a image root folder, albutim can generate a HTML
 photo album -- either to be served statically or by using the built-in server.`,
 }
@@ -35,13 +36,15 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.albutim.yaml)")
-	rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
+	//rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
+	rootCmd.PersistentFlags().StringP("root", "r", "", "album/original images root path")
+	rootCmd.PersistentFlags().StringVar(&albumTitle, "title", "Yet another timalbum", "album title")
+
+	// FIXME no worky worky coming from config file...
+	// https://stackoverflow.com/questions/41578264/config-file-with-cobra-and-viper ??
+	// viper.BindPFlag("root", rootCmd.PersistentFlags().Lookup("root"))
 
 	rootCmd.MarkPersistentFlagRequired("root")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -59,6 +62,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".albutim" (without extension).
 		viper.AddConfigPath(home)
+		viper.AddConfigPath(".")
 		viper.SetConfigName(".albutim")
 	}
 
