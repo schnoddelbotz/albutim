@@ -8,6 +8,7 @@ var VIEWMODE_IMAGE = 1;  /* const, it is... */
 var currentView = VIEWMODE_FOLDER;
 var currentFolder = "/";
 var showImageInfo = false;
+var runningFullScreen = false;
 
 $(function () {
   if (serveStatically /* defined in <head> */) {
@@ -176,6 +177,9 @@ function showFolder(imgFolder) {
   var growingDelay = 0;
   $("#thumb-navigation").html('');
 
+  // always show mouse cursor in folder view
+  $('body').css('cursor', 'auto');
+
   // add folders
   var subFolders = getSubFolders(folder);
   if (subFolders != null) {
@@ -267,6 +271,12 @@ function showImage(folder, image) {
   var imgdata = findPath(folder + image);
   if (imgdata == null) {
     return show404('image', image);
+  }
+
+  if (runningFullScreen) {
+    $('body').css('cursor', 'none');
+  } else {
+    $('body').css('cursor', 'auto');
   }
 
   // update EXIF info panel
@@ -391,6 +401,7 @@ function toggleFullScreen() {
       document.documentElement.webkitRequestFullscreen(
           Element.ALLOW_KEYBOARD_INPUT);
     }
+    runningFullScreen = true;
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -401,6 +412,8 @@ function toggleFullScreen() {
     } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
     }
+    runningFullScreen = false;
+    $('body').css('cursor', 'auto');
   }
 }
 
