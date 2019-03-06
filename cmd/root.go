@@ -14,17 +14,16 @@ var cfgFile string
 var albumRoot string
 var albumTitle string
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Version: AppVersion,
 	Use:     "albutim",
 	Short:   "albutim is yet another photo album generator and server",
 	Long: `Provided with a image root folder, albutim can generate a HTML
-photo album -- either to be served statically or by using the built-in server.`,
+photo album -- either to be served statically or by using the built-in server.
+
+Further documentation: https://github.com/schnoddelbotz/albutim`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -36,8 +35,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.albutim.yaml)")
-	//rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
-	rootCmd.PersistentFlags().StringP("root", "r", "", "album/original images root path")
+	rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
+	//rootCmd.PersistentFlags().StringP("root", "r", "", "album/original images root path")
 	rootCmd.PersistentFlags().StringVar(&albumTitle, "title", "Yet another timalbum", "album title")
 
 	// FIXME no worky worky coming from config file...

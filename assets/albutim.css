@@ -273,7 +273,7 @@ h1 {
   color:#ccc;
 }
 
-#info-button {
+#info-button:hover, .singlethumb-container:hover, #help-button:hover {
   cursor:pointer;
 }
 

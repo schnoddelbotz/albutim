@@ -8,12 +8,17 @@
         "Simple" template | part of albutim
         https://github.com/schnoddelbotz/albutim
   -->
+  <script>
+    var serveStatically = {{.ServeStatically}};
+  </script>
   <link href="assets/albutim.css" type="text/css" rel="stylesheet" />
   <script src="assets/jquery-2.2.2.min.js" type="text/javascript"></script>
+  {{ if .ServeStatically }}<script src="albumdata.js" type="text/javascript"></script>{{ end }}
   <script src="assets/albutim.js" type="text/javascript"></script>
 </head>
 <body onhashchange="hashChanged()">
 <div id="full">
+  <noscript>Ooops! Please enable JavaScript to browse this image gallery!</noscript>
   <div id="background-image"></div>
 	<div id="header" class="border">
 		<h1><a href="#/" id="headerAlbumTitle" title="Press ESC to return to main index"><!-- title --></a> » <a href="#/" id="headerFolderTitle" title="Press ↑ key to return to folder"><!-- folder --></a></h1>
@@ -45,32 +50,32 @@
            <div id="image-info" class="box">
             <p>Image Information</p>
             <dl>
-              <dt>Date / Time</dt> <dd id="DateTime">7/2/11 6:xx?</dd>
+              <dt>Date / Time</dt> <dd id="dateTime">7/2/11 6:xx?</dd>
 
-              <dt>Camera</dt> <dd id="Model">???</dd>
+              <dt>Camera</dt> <dd id="model">???</dd>
 
               <dt>Aperture | EM | Flash</dt>
               <dd>
-                <span id="FNum"></span> | <span id="ExposureMode">Auto exposure?</span> <br>
-                <span id="Flash">Flash did not fire?</span>
+                <span id="fNum"></span> | <span id="exposureMode">Auto exposure?</span> <br>
+                <span id="flash">Flash did not fire?</span>
               </dd>
 
               <dt>Time | Bias | ISO</dt>
               <dd>
-                <span id="ExposureTime"></span>s | <span id="ExposureBiasValue"></span>  | <span id="ISOSpeedRatings">4xx00?</span>
+                <span id="exposureTime"></span>s | <span id="exposureBiasValue"></span>  | <span id="ISOSpeedRatings">4xx00?</span>
               </dd>
 
               <dt>FL | FL [35mm] | WB</dt>
               <dd>
-                <span id="FocalLength"></span>mm |
-                <span id="FocalLengthIn35mmFilm"></span>mm |
-                <span id="WhiteBalance"></span>
+                <span id="focalLength"></span>mm |
+                <span id="focalLengthIn35mmFilm"></span>mm |
+                <span id="whiteBalance"></span>
               </dd>
 
               <dt>Resolution | Size</dt>
               <dd>
-                <span id="ExifImageLength">123</span> x <span id="ExifImageWidth">777</span> |
-                <span id="FileSize">???</span>
+                <span id="exifImageLength">123</span> x <span id="exifImageWidth">777</span> |
+                <span id="fileSize">???</span>
               </dd>
 
             </dl>
@@ -88,8 +93,8 @@
   <div class="clearer"></div>
   <div id="footer" class="border">
 			<p>
-        <a id="info-button">| image information |</a>
-        album made with
+        <a id="help-button">keyboard shortcuts</a> |
+        <a id="info-button">image information |</a> album made with
         <a href="https://github.com/schnoddelbotz/albutim" title="albutim 0">albutim</a>
       </p>
 	</div>

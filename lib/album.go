@@ -15,7 +15,7 @@ type Album struct {
 	Title           string `json:"title"`
 	SubTitle        string `json:"subTitle"`
 	CreatedAt       string `json:"createdAt"`
-	RootPath        string `json:"rootPath"`
+	RootPath        string `json:"-"`
 	Data            *Node  `json:"data"`
 	ServeStatically bool   `json:"serveStatically"`
 }
@@ -86,6 +86,7 @@ func ScanDir(root string) (result *Node, err error) {
 			parent.Children = append(parent.Children, node)
 		}
 	}
+	result.FullPath = "/"
 	return
 }
 

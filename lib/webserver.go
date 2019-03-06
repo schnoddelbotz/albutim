@@ -9,16 +9,17 @@ import (
 )
 
 type server struct {
-	albumData Album
+	album Album
 }
 
-//func Serve(albumRoot string, httpPort string) {
 func Serve(a Album, httpPort string) {
-	srv := new(server)
-	srv.albumData = a
+	srv := &server{album: a}
+
 	http.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(_escFS(false))))
 	http.Handle("/originals/", http.StripPrefix("/originals", http.FileServer(http.Dir(a.RootPath))))
-	http.HandleFunc("/thumbs/", srv.thumbHandler)
+	http.Handle("/thumbs/", http.StripPrefix("/thumbs", http.FileServer(http.Dir(a.RootPath))))
+	http.Handle("/preview/", http.StripPrefix("/preview", http.FileServer(http.Dir(a.RootPath))))
+	//http.HandleFunc("/thumbs/", srv.thumbHandler)
 	http.HandleFunc("/albumdata.json", srv.albumDataHandler)
 	http.HandleFunc("/", srv.indexHandler)
 
@@ -28,12 +29,12 @@ func Serve(a Album, httpPort string) {
 
 func (s *server) albumDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	json, _ := json.Marshal(s.albumData)
+	json, _ := json.Marshal(s.album)
 	w.Write(json)
 }
 
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write(renderIndexTemplate(s.albumData))
+	w.Write(renderIndexTemplate(s.album))
 }
 
 func (s *server) thumbHandler(w http.ResponseWriter, r *http.Request) {
