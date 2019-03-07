@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -13,6 +13,7 @@ var AppVersion string
 var cfgFile string
 var albumRoot string
 var albumTitle string
+var threads int
 
 var rootCmd = &cobra.Command{
 	Version: AppVersion,
@@ -36,14 +37,16 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.albutim.yaml)")
 	rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
-	//rootCmd.PersistentFlags().StringP("root", "r", "", "album/original images root path")
-	rootCmd.PersistentFlags().StringVar(&albumTitle, "title", "Yet another timalbum", "album title")
 
-	// FIXME no worky worky coming from config file...
-	// https://stackoverflow.com/questions/41578264/config-file-with-cobra-and-viper ??
-	// viper.BindPFlag("root", rootCmd.PersistentFlags().Lookup("root"))
+	rootCmd.PersistentFlags().StringP("title", "t", "Yet another timalbum", "album title")
+	rootCmd.PersistentFlags().BoolP("no-scaled-thumbs", "s", false, "don't produce scaled thumbnails")
+	rootCmd.PersistentFlags().BoolP("no-scaled-previews", "S", false, "don't produce scaled previews")
 
-	rootCmd.MarkPersistentFlagRequired("root")
+	_ = viper.BindPFlag("title", rootCmd.PersistentFlags().Lookup("title"))
+	_ = viper.BindPFlag("no-scaled-thumbs", rootCmd.PersistentFlags().Lookup("no-scaled-thumbs"))
+	_ = viper.BindPFlag("no-scaled-previews", rootCmd.PersistentFlags().Lookup("no-scaled-previews"))
+
+	_ = rootCmd.MarkPersistentFlagRequired("root")
 }
 
 // initConfig reads in config file and ENV variables if set.

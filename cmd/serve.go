@@ -8,6 +8,7 @@ import (
 	"github.com/schnoddelbotz/albutim/lib"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var httpPort string
@@ -28,10 +29,12 @@ var serveCmd = &cobra.Command{
 		}
 
 		album := &lib.Album{
-			SubTitle: "all the fun pics!",
-			RootPath: albumRoot,
-			Title:    albumTitle,
-			Data:     albumData}
+			SubTitle:         "all the fun pics!",
+			RootPath:         albumRoot,
+			Title:            viper.GetString("title"),
+			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
+			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
+			Data:             albumData}
 		lib.Serve(*album, httpPort)
 	},
 }

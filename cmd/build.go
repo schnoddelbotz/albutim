@@ -1,8 +1,8 @@
-
 package cmd
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -22,4 +22,5 @@ albutim --root my-images build --output my-album`,
 
 func init() {
 	rootCmd.AddCommand(buildCmd)
+	buildCmd.PersistentFlags().IntVar(&threads, "threads", runtime.NumCPU(), "threads for thumb generation")
 }
