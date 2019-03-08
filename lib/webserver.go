@@ -2,11 +2,9 @@ package lib
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -33,7 +31,10 @@ func Serve(a Album, httpPort string) {
 	http.HandleFunc("/", srv.indexHandler)
 
 	log.Printf("Starting Server on port %s\n", httpPort)
-	http.ListenAndServe(":"+httpPort, nil)
+	err := http.ListenAndServe(":"+httpPort, nil)
+	if err != nil {
+		log.Fatalf("Could not start server: %s", err)
+	}
 }
 
 func (s *server) albumDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +44,10 @@ func (s *server) albumDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write(renderIndexTemplate(s.album))
+	_, err := w.Write(renderIndexTemplate(s.album))
+	if err != nil {
+		log.Printf("Sending index.html failed: %s", err)
+	}
 }
 
 func (s *server) thumbHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +64,7 @@ func (s *server) thumbHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-type", "image/jpeg")
 	_, _ = w.Write(scaled)
-	s.addCache(thumb, scaled)
+	s.album.addCache(thumb, scaled)
 }
 
 func (s *server) previewHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,27 +81,11 @@ func (s *server) previewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-type", "image/jpeg")
 	_, _ = w.Write(scaled)
-	s.addCache(preview, scaled)
-}
-
-func (s *server) addCache(file string, data []byte) {
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		//log.Printf("Add to cache: %s", file)
-		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
-		if err != nil {
-			log.Printf("mkdir %s error: %s", filepath.Dir(file), err)
-			return
-		}
-		err = ioutil.WriteFile(file, data, 0644)
-		if err != nil {
-			log.Printf("write %s error: %s", file, err)
-		}
-	}
+	s.album.addCache(preview, scaled)
 }
 
 func (s *server) serveCached(w http.ResponseWriter, r *http.Request, file string) bool {
 	if _, err := os.Stat(file); err == nil {
-		//log.Printf("Serve from cache: %s", file)
 		http.ServeFile(w, r, file)
 		return true
 	}

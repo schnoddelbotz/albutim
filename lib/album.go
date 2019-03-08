@@ -3,6 +3,7 @@ package lib
 import (
 	"bytes"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,6 +20,8 @@ type Album struct {
 	ServeStatically  bool   `json:"serveStatically"`
 	NoScaledThumbs   bool   `json:"-"`
 	NoScaledPreviews bool   `json:"-"`
+	NoCacheScaled    bool   `json:"-"`
+	NumThreads       int    `json:"-"`
 }
 
 type ExifData struct {
@@ -39,7 +42,6 @@ type ExifData struct {
 	WhiteBalance          string `json:"whiteBalance,omitempty"`
 }
 
-// Node represents a node in a directory tree.
 type Node struct {
 	FullPath string   `json:"path"`
 	Name     string   `json:"name"`
@@ -51,8 +53,18 @@ type Node struct {
 	ExifData ExifData `json:"exifdata,omitempty"`
 }
 
+func BuildAlbum(a Album) {
+	log.Printf("Building Album '%s'", a.Title)
+
+	if !a.NoScaledPreviews || !a.NoScaledThumbs {
+		a.buildThumbsAndPreviews()
+	}
+
+	log.Print("Copying index.html and template files to album...")
+}
+
 func ScanDir(root string) (result *Node, err error) {
-	log.Print("Reading images in %s", root)
+	log.Printf("Reading images in %s ...", root)
 	thumbDir := root + "/thumbs"
 	previewDir := root + "/preview"
 	parents := make(map[string]*Node)
@@ -97,8 +109,96 @@ func ScanDir(root string) (result *Node, err error) {
 			parent.Children = append(parent.Children, node)
 		}
 	}
+	log.Print("Reading images: completed")
 	result.FullPath = "/"
 	return
+}
+
+func (n *Node) getAllImagePaths() []string {
+	var toVisit []*Node
+	var images []string
+	toVisit = append(toVisit, n)
+	for len(toVisit) > 0 {
+		c := toVisit[0]
+		if c.IsImage {
+			images = append(images, c.FullPath)
+		} else {
+			toVisit = append(toVisit, c.Children...)
+		}
+		toVisit = toVisit[1:]
+	}
+	return images
+}
+
+func (a *Album) buildThumbsAndPreviews() {
+	log.Printf("Building previews and thumbnails using %d threads ...", a.NumThreads)
+	jobs := make(chan string, 100)
+	results := make(chan int, 100)
+	for w := 0; w <= a.NumThreads-1; w++ {
+		go a.imageScalingWorker(w, jobs, results)
+	}
+	imagePaths := a.Data.getAllImagePaths()
+	for _, path := range imagePaths {
+		jobs <- path
+	}
+	close(jobs)
+	for range imagePaths {
+		<-results
+	}
+	log.Print("Building previews and thumbnails: done.")
+}
+
+func (a *Album) imageScalingWorker(id int, jobs <-chan string, results chan<- int) {
+	for relativeImagePath := range jobs {
+		originalPath := a.RootPath + relativeImagePath
+		previewPath := a.RootPath + "/preview" + relativeImagePath
+		thumbPath := a.RootPath + "/thumbs" + relativeImagePath
+		var todo []string
+
+		if _, err := os.Stat(thumbPath); os.IsNotExist(err) && !a.NoScaledThumbs {
+			todo = append(todo, "thumb")
+			thumb, err := getScaled(originalPath, 0, 105 /* FIXME config value */)
+			if err != nil {
+				log.Printf("scalingError for %s: %s", relativeImagePath, err)
+				return
+			}
+			a.addCache(thumbPath, thumb)
+		}
+
+		if _, err := os.Stat(previewPath); os.IsNotExist(err) && !a.NoScaledPreviews {
+			todo = append(todo, "preview")
+			preview, err := getScaled(originalPath, 0, 700 /* FIXME config value */)
+			if err != nil {
+				log.Printf("scalingError for %s: %s", relativeImagePath, err)
+				return
+			}
+			a.addCache(previewPath, preview)
+		}
+
+		if len(todo) > 0 {
+			log.Printf("[thread-%d] %s created for %s", id, strings.Join(todo, "+"), relativeImagePath)
+		}
+
+		results <- 1
+	}
+}
+
+func (a *Album) addCache(file string, data []byte) {
+	if a.NoCacheScaled {
+		return
+	}
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		//log.Printf("Add to cache: %s", file)
+		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
+		if err != nil {
+			log.Printf("mkdir %s error: %s", filepath.Dir(file), err)
+			return
+		}
+		err = ioutil.WriteFile(file, data, 0644)
+		if err != nil {
+			log.Printf("write %s error: %s", file, err)
+		}
+	}
 }
 
 func renderIndexTemplate(data Album) []byte {

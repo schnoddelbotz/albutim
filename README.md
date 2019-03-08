@@ -34,3 +34,4 @@ web ui ...
 - [ ] autoplay feature (dropdown: whole album, current folder, folder+subfolders; delay in s)
 - [ ] windows: fwd vs back-slashes in paths -> thumbs ok, but previews not... test ec2/public! https://stackoverflow.com/questions/9371031/how-do-i-create-crossplatform-file-paths-in-go
 - [ ] windows: use https://github.com/inconshreveable/mousetrap ? or is cobra already?
+- [ ] electron: https://hackernoon.com/how-to-add-a-gui-to-your-golang-app-in-5-easy-steps-c25c99d4d8e0

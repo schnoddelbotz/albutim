@@ -34,6 +34,7 @@ var serveCmd = &cobra.Command{
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
+			NoCacheScaled:    viper.GetBool("no-cache-scaled"),
 			Data:             albumData}
 		lib.Serve(*album, httpPort)
 	},
@@ -42,4 +43,7 @@ var serveCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(serveCmd)
 	serveCmd.Flags().StringVar(&httpPort, "port", "3000", "HTTP port to serve on")
+
+	serveCmd.PersistentFlags().BoolP("no-cache-scaled", "n", false, "do not cache scaled thumbs/previews")
+	_ = viper.BindPFlag("no-cache-scaled", serveCmd.PersistentFlags().Lookup("no-cache-scaled"))
 }

@@ -1,11 +1,18 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"runtime"
 
+	"github.com/schnoddelbotz/albutim/lib"
+
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var threads int
 
 // buildCmd represents the build command
 var buildCmd = &cobra.Command{
@@ -16,7 +23,25 @@ data from images and generates required index.html files and thumbnails. Usage e
 
 albutim --root my-images build --output my-album`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("build called")
+		if _, err := os.Stat(albumRoot); os.IsNotExist(err) {
+			log.Fatalf("Album root directory '%s' does not exist!\n", albumRoot)
+		}
+		albumRoot = filepath.Clean(albumRoot)
+
+		albumData, err := lib.ScanDir(albumRoot)
+		if err != nil {
+			log.Fatalf("Cannot scan '%s': %s", albumRoot, err)
+		}
+
+		album := &lib.Album{
+			SubTitle:         "all the fun pics!",
+			RootPath:         albumRoot,
+			Title:            viper.GetString("title"),
+			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
+			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
+			NumThreads:       threads,
+			Data:             albumData}
+		lib.BuildAlbum(*album)
 	},
 }
 

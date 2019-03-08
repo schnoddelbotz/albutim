@@ -13,7 +13,6 @@ var AppVersion string
 var cfgFile string
 var albumRoot string
 var albumTitle string
-var threads int
 
 var rootCmd = &cobra.Command{
 	Version: AppVersion,

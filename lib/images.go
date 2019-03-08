@@ -80,7 +80,7 @@ func getExif(path string) (data ExifData, err error) {
 }
 
 func _getExifData(fname string) (x *exif.Exif, err error) {
-	log.Printf("Getting EXIF data: %s", fname)
+	//log.Printf("Getting EXIF data: %s", fname)
 	f, err := os.Open(fname)
 	if err != nil {
 		log.Printf("Error reading EXIF from %s: %s", fname, err)
