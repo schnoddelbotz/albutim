@@ -12,7 +12,7 @@ var runningFullScreen = false;
 
 $(function () {
   if (serveStatically /* defined in <head> */) {
-    console.log('I should get albumData from <script src="...">');
+    // console.log('I should get albumData from <script src="...">');
     initAlbum();
   } else {
     $.ajax({

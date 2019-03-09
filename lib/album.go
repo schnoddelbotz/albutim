@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/nfnt/resize"
 	"html/template"
 	"image"
@@ -65,7 +66,32 @@ func BuildAlbum(a Album) {
 		a.buildThumbsAndPreviews()
 	}
 
-	log.Print("Copying index.html and template files to album...")
+	indexHTML := renderIndexTemplate(a)
+	indexFile := a.RootPath + string(filepath.Separator) + "index.html"
+	log.Printf("Rendering index.html into %s", indexFile)
+	err := ioutil.WriteFile(indexFile, indexHTML, 0644)
+	if err != nil {
+		log.Printf("write %s ERROR: %s", indexFile, err)
+	}
+
+	albumData, _ := json.Marshal(a)
+	albumFile := a.RootPath + string(filepath.Separator) + "albumdata.js"
+	log.Printf("Rendering albumdata.js into %s", albumFile)
+	f, err := os.Create(albumFile)
+	//err = ioutil.WriteFile(albumFile, albumData, 0644)
+	if err != nil {
+		log.Printf("write %s ERROR: %s", indexFile, err)
+	} else {
+		f.Write([]byte("albumData = "))
+		f.Write(albumData)
+		f.Write([]byte(";\n"))
+		f.Close()
+	}
+
+	assetsPath := filepath.FromSlash(a.RootPath + "/assets")
+	log.Printf("Copying assets into %s", assetsPath)
+	a.copyAssets(assetsPath)
+	log.Printf("Nice! All done. Now open %s", indexFile)
 }
 
 func ScanDir(root string, a *Album) (result *Node, err error) {
@@ -80,6 +106,7 @@ func ScanDir(root string, a *Album) (result *Node, err error) {
 			return nil
 		}
 		if strings.HasPrefix(path, filepath.FromSlash(a.getPathOfThumbnails())) ||
+			strings.HasPrefix(path, filepath.FromSlash(a.RootPath+"/assets")) ||
 			strings.HasPrefix(path, filepath.FromSlash(a.getPathOfPreviews())) {
 			// skip folder created by us
 			return nil
@@ -181,9 +208,6 @@ func (a *Album) buildThumbsAndPreviews() {
 	log.Print("Building previews and thumbnails: done.")
 }
 
-// 6m 14s -- using getScaled(), decodes twice
-// 5m 4s without using preview as input for thumb (decodes once)
-// 4m 1s with using preview as input for thumb (decodes preview for 2nd run, less resize work)
 func (a *Album) imageScalingWorker(id int, jobs <-chan Node, results chan<- int) {
 	for imageNode := range jobs {
 		originalPath := imageNode.getPathOfOriginal()
@@ -274,6 +298,26 @@ func (a *Album) addCache(file string, data []byte) (err error) {
 		}
 	}
 	return
+}
+
+func (a *Album) copyAssets(targetDir string) {
+	assets := []string{"albutim.css", "albutim.js", "folder-up.svg", "jquery-2.2.2.min.js"}
+	for _, asset := range assets {
+		log.Printf("  copying %s -> %s", asset, targetDir)
+		fileData := _escFSMustByte(false, "/"+asset)
+		filename := targetDir + string(filepath.Separator) + asset
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			err = os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+			if err != nil {
+				log.Printf("mkdir %s error: %s", filepath.Dir(filename), err)
+				return
+			}
+			err = ioutil.WriteFile(filename, fileData, 0644)
+			if err != nil {
+				log.Printf("write %s error: %s", filename, err)
+			}
+		}
+	}
 }
 
 func renderIndexTemplate(data Album) []byte {

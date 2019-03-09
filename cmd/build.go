@@ -34,6 +34,7 @@ albutim --root my-images build --output my-album`,
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
+			ServeStatically:  true,
 			NumThreads:       threads}
 
 		var e error
