@@ -2,7 +2,10 @@ package lib
 
 import (
 	"bytes"
+	"github.com/nfnt/resize"
 	"html/template"
+	"image"
+	"image/jpeg"
 	"io/ioutil"
 	"log"
 	"os"
@@ -43,13 +46,14 @@ type ExifData struct {
 }
 
 type Node struct {
+	Parent   *Node    `json:"-"`
+	Children []*Node  `json:"children"`
+	Album    *Album   `json:"-"`
 	FullPath string   `json:"path"`
 	Name     string   `json:"name"`
 	Size     int64    `json:"size"`
 	IsDir    bool     `json:"is_dir"`
 	IsImage  bool     `json:"is_image"`
-	Children []*Node  `json:"children"`
-	Parent   *Node    `json:"-"`
 	ExifData ExifData `json:"exifdata,omitempty"`
 }
 
@@ -63,10 +67,8 @@ func BuildAlbum(a Album) {
 	log.Print("Copying index.html and template files to album...")
 }
 
-func ScanDir(root string) (result *Node, err error) {
+func ScanDir(root string, a *Album) (result *Node, err error) {
 	log.Printf("Reading images in %s ...", root)
-	thumbDir := root + "/thumbs"
-	previewDir := root + "/preview"
 	parents := make(map[string]*Node)
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -76,7 +78,7 @@ func ScanDir(root string) (result *Node, err error) {
 			// skip dotfiles. log?
 			return nil
 		}
-		if strings.HasPrefix(path, thumbDir) || strings.HasPrefix(path, previewDir) {
+		if strings.HasPrefix(path, a.getPathOfThumbnails()) || strings.HasPrefix(path, a.getPathOfPreviews()) {
 			// skip folder created by us
 			return nil
 		}
@@ -85,6 +87,7 @@ func ScanDir(root string) (result *Node, err error) {
 			Name:     info.Name(),
 			IsDir:    info.IsDir(),
 			Size:     info.Size(),
+			Album:    a,
 			Children: make([]*Node, 0),
 		}
 		if !info.IsDir() && isImage(path) {
@@ -114,14 +117,14 @@ func ScanDir(root string) (result *Node, err error) {
 	return
 }
 
-func (n *Node) getAllImagePaths() []string {
+func (n *Node) getAllImages() []Node {
 	var toVisit []*Node
-	var images []string
+	var images []Node
 	toVisit = append(toVisit, n)
 	for len(toVisit) > 0 {
 		c := toVisit[0]
 		if c.IsImage {
-			images = append(images, c.FullPath)
+			images = append(images, *c)
 		} else {
 			toVisit = append(toVisit, c.Children...)
 		}
@@ -130,75 +133,144 @@ func (n *Node) getAllImagePaths() []string {
 	return images
 }
 
+func (a *Album) getPathOriginals() string {
+	return a.RootPath
+}
+
+func (a *Album) getPathOfThumbnails() string {
+	return a.RootPath + "/thumbs"
+}
+
+func (a *Album) getPathOfPreviews() string {
+	return a.RootPath + "/preview"
+}
+
+func (n *Node) getPathOfOriginal() string {
+	return n.Album.RootPath + n.FullPath
+}
+
+func (n *Node) getPathOfThumbnail() string {
+	return n.Album.RootPath + "/thumbs" + n.FullPath
+}
+
+func (n *Node) getPathOfPreview() string {
+	return n.Album.RootPath + "/preview" + n.FullPath
+}
+
 func (a *Album) buildThumbsAndPreviews() {
 	log.Printf("Building previews and thumbnails using %d threads ...", a.NumThreads)
-	jobs := make(chan string, 100)
-	results := make(chan int, 100)
+	// FIXME limits max amounts of images...
+	// removing 8192 will ...
+	// https://stackoverflow.com/questions/26927479/go-language-fatal-error-all-goroutines-are-asleep-deadlock
+	jobs := make(chan Node, 8192)
+	results := make(chan int, 8192)
 	for w := 0; w <= a.NumThreads-1; w++ {
 		go a.imageScalingWorker(w, jobs, results)
 	}
-	imagePaths := a.Data.getAllImagePaths()
-	for _, path := range imagePaths {
+	imageNodes := a.Data.getAllImages()
+	for _, path := range imageNodes {
 		jobs <- path
 	}
 	close(jobs)
-	for range imagePaths {
+	for range imageNodes {
 		<-results
 	}
 	log.Print("Building previews and thumbnails: done.")
 }
 
-func (a *Album) imageScalingWorker(id int, jobs <-chan string, results chan<- int) {
-	for relativeImagePath := range jobs {
-		originalPath := a.RootPath + relativeImagePath
-		previewPath := a.RootPath + "/preview" + relativeImagePath
-		thumbPath := a.RootPath + "/thumbs" + relativeImagePath
+// 6m 14s -- using getScaled(), decodes twice
+// 5m 4s without using preview as input for thumb (decodes once)
+// 4m 1s with using preview as input for thumb (decodes preview for 2nd run, less resize work)
+func (a *Album) imageScalingWorker(id int, jobs <-chan Node, results chan<- int) {
+	for imageNode := range jobs {
+		originalPath := imageNode.getPathOfOriginal()
+		previewPath := imageNode.getPathOfPreview()
+		thumbPath := imageNode.getPathOfThumbnail()
+		buildThumb := false
+		buildPreview := false
 		var todo []string
-
 		if _, err := os.Stat(thumbPath); os.IsNotExist(err) && !a.NoScaledThumbs {
 			todo = append(todo, "thumb")
-			thumb, err := getScaled(originalPath, 0, 105 /* FIXME config value */)
-			if err != nil {
-				log.Printf("scalingError for %s: %s", relativeImagePath, err)
-				return
-			}
-			a.addCache(thumbPath, thumb)
+			buildThumb = true
 		}
-
 		if _, err := os.Stat(previewPath); os.IsNotExist(err) && !a.NoScaledPreviews {
 			todo = append(todo, "preview")
-			preview, err := getScaled(originalPath, 0, 700 /* FIXME config value */)
-			if err != nil {
-				log.Printf("scalingError for %s: %s", relativeImagePath, err)
-				return
-			}
-			a.addCache(previewPath, preview)
+			buildPreview = true
 		}
-
+		if len(todo) == 0 {
+			results <- 1
+			continue
+		}
 		if len(todo) > 0 {
-			log.Printf("[thread-%d] %s created for %s", id, strings.Join(todo, "+"), relativeImagePath)
+			bufP := &bytes.Buffer{}
+			bufT := &bytes.Buffer{}
+			file, err := os.Open(originalPath)
+			var originalImage image.Image
+			var previewImage image.Image
+			if err == nil {
+				originalImage, err = jpeg.Decode(file)
+				if err == nil {
+					err = file.Close()
+					if err != nil {
+						log.Printf("Decoding %s failed: %s", originalPath, err)
+						results <- 1
+						continue
+					}
+					if buildPreview {
+						previewImage = a.buildView(imageNode, 700, originalImage, nil, bufP, imageNode.getPathOfPreview())
+					}
+					if buildThumb {
+						a.buildView(imageNode, 105, originalImage, previewImage, bufT, imageNode.getPathOfThumbnail())
+					}
+				}
+			}
+			log.Printf("[thread-%d] %s created for %s", id, strings.Join(todo, "+"), originalPath)
 		}
-
 		results <- 1
 	}
 }
 
-func (a *Album) addCache(file string, data []byte) {
+func (a *Album) buildView(albumImage Node, height uint, original image.Image, preview image.Image, output *bytes.Buffer, outoutPath string) image.Image {
+	var m image.Image
+
+	//log.Printf("buildView h %d %s", height, outoutPath)
+	if preview == nil {
+		m = resize.Resize(0, height, original, resize.Bicubic)
+	} else {
+		m = resize.Resize(0, height, preview, resize.Bicubic)
+	}
+
+	err := jpeg.Encode(output, m, nil /* FIXME add quality config option */)
+	if err != nil {
+		log.Printf("Resizing %s error: %s", albumImage.getPathOfOriginal(), err)
+	} else {
+		err = a.addCache(outoutPath, output.Bytes())
+		if err != nil {
+			log.Printf("addCache %s error: %s", outoutPath, err)
+		}
+	}
+	// FIXME return err here!
+
+	return m
+}
+
+func (a *Album) addCache(file string, data []byte) (err error) {
 	if a.NoCacheScaled {
-		return
+		return nil
 	}
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		//log.Printf("Add to cache: %s", file)
 		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
 		if err != nil {
 			log.Printf("mkdir %s error: %s", filepath.Dir(file), err)
-			return
+			return err
 		}
 		err = ioutil.WriteFile(file, data, 0644)
 		if err != nil {
 			log.Printf("write %s error: %s", file, err)
 		}
 	}
+	return
 }
 
 func renderIndexTemplate(data Album) []byte {

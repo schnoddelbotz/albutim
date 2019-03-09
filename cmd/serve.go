@@ -23,19 +23,20 @@ var serveCmd = &cobra.Command{
 		}
 		albumRoot = filepath.Clean(albumRoot)
 
-		albumData, err := lib.ScanDir(albumRoot)
-		if err != nil {
-			log.Fatalf("Cannot scan '%s': %s", albumRoot, err)
-		}
-
 		album := &lib.Album{
 			SubTitle:         "all the fun pics!",
 			RootPath:         albumRoot,
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
-			NoCacheScaled:    viper.GetBool("no-cache-scaled"),
-			Data:             albumData}
+			NoCacheScaled:    viper.GetBool("no-cache-scaled")}
+
+		var e error
+		album.Data, e = lib.ScanDir(albumRoot, album)
+		if e != nil {
+			log.Fatalf("Cannot scan '%s': %s", albumRoot, e)
+		}
+
 		lib.Serve(*album, httpPort)
 	},
 }

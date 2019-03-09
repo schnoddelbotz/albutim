@@ -28,19 +28,20 @@ albutim --root my-images build --output my-album`,
 		}
 		albumRoot = filepath.Clean(albumRoot)
 
-		albumData, err := lib.ScanDir(albumRoot)
-		if err != nil {
-			log.Fatalf("Cannot scan '%s': %s", albumRoot, err)
-		}
-
 		album := &lib.Album{
 			SubTitle:         "all the fun pics!",
 			RootPath:         albumRoot,
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
-			NumThreads:       threads,
-			Data:             albumData}
+			NumThreads:       threads}
+
+		var e error
+		album.Data, e = lib.ScanDir(albumRoot, album)
+		if e != nil {
+			log.Fatalf("Cannot scan '%s': %s", albumRoot, e)
+		}
+
 		lib.BuildAlbum(*album)
 	},
 }
