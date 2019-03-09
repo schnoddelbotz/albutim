@@ -57,6 +57,7 @@ func (s *server) thumbHandler(w http.ResponseWriter, r *http.Request) {
 	if s.serveCached(w, r, thumb) {
 		return
 	}
+	// fixme: scale from preview if present
 	scaled, err := getScaled(original, 0, 105 /* FIXME config value */)
 	if err != nil {
 		http.Error(w, "Preview failed", 500)

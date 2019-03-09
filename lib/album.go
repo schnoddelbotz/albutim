@@ -49,7 +49,8 @@ type Node struct {
 	Parent   *Node    `json:"-"`
 	Children []*Node  `json:"children"`
 	Album    *Album   `json:"-"`
-	FullPath string   `json:"path"`
+	FullPath string   `json:"-"`
+	WebPath  string   `json:"path"`
 	Name     string   `json:"name"`
 	Size     int64    `json:"size"`
 	IsDir    bool     `json:"is_dir"`
@@ -78,12 +79,14 @@ func ScanDir(root string, a *Album) (result *Node, err error) {
 			// skip dotfiles. log?
 			return nil
 		}
-		if strings.HasPrefix(path, a.getPathOfThumbnails()) || strings.HasPrefix(path, a.getPathOfPreviews()) {
+		if strings.HasPrefix(path, filepath.FromSlash(a.getPathOfThumbnails())) ||
+			strings.HasPrefix(path, filepath.FromSlash(a.getPathOfPreviews())) {
 			// skip folder created by us
 			return nil
 		}
 		parents[path] = &Node{
 			FullPath: strings.TrimPrefix(path, root),
+			WebPath:  filepath.ToSlash(strings.TrimPrefix(path, root)),
 			Name:     info.Name(),
 			IsDir:    info.IsDir(),
 			Size:     info.Size(),
@@ -113,7 +116,7 @@ func ScanDir(root string, a *Album) (result *Node, err error) {
 		}
 	}
 	log.Print("Reading images: completed")
-	result.FullPath = "/"
+	result.WebPath = "/"
 	return
 }
 
