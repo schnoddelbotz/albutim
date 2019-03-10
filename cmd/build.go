@@ -29,7 +29,7 @@ albutim --root my-images build --output my-album`,
 		albumRoot = filepath.Clean(albumRoot)
 
 		album := &lib.Album{
-			SubTitle:         "all the fun pics!",
+			SubTitle:         viper.GetString("tagline"),
 			RootPath:         albumRoot,
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),

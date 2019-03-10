@@ -74,24 +74,30 @@ func BuildAlbum(a Album) {
 		log.Printf("write %s ERROR: %s", indexFile, err)
 	}
 
-	albumData, _ := json.Marshal(a)
 	albumFile := a.RootPath + string(filepath.Separator) + "albumdata.js"
-	log.Printf("Rendering albumdata.js into %s", albumFile)
-	f, err := os.Create(albumFile)
-	//err = ioutil.WriteFile(albumFile, albumData, 0644)
-	if err != nil {
-		log.Printf("write %s ERROR: %s", indexFile, err)
-	} else {
-		f.Write([]byte("albumData = "))
-		f.Write(albumData)
-		f.Write([]byte(";\n"))
-		f.Close()
-	}
+	writeAlbumDataJS(a, err, albumFile)
+	// add zipped version?
 
 	assetsPath := filepath.FromSlash(a.RootPath + "/assets")
 	log.Printf("Copying assets into %s", assetsPath)
 	a.copyAssets(assetsPath)
 	log.Printf("Nice! All done. Now open %s", indexFile)
+}
+
+func writeAlbumDataJS(a Album, err error, outFile string) error {
+	albumData, _ := json.Marshal(a)
+	log.Printf("Rendering albumdata.js into %s", outFile)
+	f, err := os.Create(outFile)
+	if err != nil {
+		log.Printf("write %s ERROR: %s", outFile, err)
+		return err
+	}
+	// FIXME handleErr
+	f.Write([]byte("albumData = "))
+	f.Write(albumData)
+	f.Write([]byte(";\n"))
+	f.Close()
+	return nil
 }
 
 func ScanDir(root string, a *Album) (result *Node, err error) {

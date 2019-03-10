@@ -14,6 +14,8 @@ var cfgFile string
 var albumRoot string
 var albumTitle string
 
+// FIXME add cmd/destroy.go -- rm files installed
+
 var rootCmd = &cobra.Command{
 	Version: AppVersion,
 	Use:     "albutim",
@@ -37,11 +39,17 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.albutim.yaml)")
 	rootCmd.PersistentFlags().StringVar(&albumRoot, "root", "", "album/original images root path")
 
+	// add StringP --assets-dir for custom templates
+
 	rootCmd.PersistentFlags().StringP("title", "t", "Yet another timalbum", "album title")
+	rootCmd.PersistentFlags().StringP("tagline", "H", "... all those pics!", "album tagline")
+	rootCmd.PersistentFlags().StringP("static-bg-image", "b", "", "use given image as single bg for album")
 	rootCmd.PersistentFlags().BoolP("no-scaled-thumbs", "s", false, "don't produce scaled thumbnails")
 	rootCmd.PersistentFlags().BoolP("no-scaled-previews", "S", false, "don't produce scaled previews")
 
 	_ = viper.BindPFlag("title", rootCmd.PersistentFlags().Lookup("title"))
+	_ = viper.BindPFlag("tagline", rootCmd.PersistentFlags().Lookup("tagline"))
+	_ = viper.BindPFlag("static-bg-image", rootCmd.PersistentFlags().Lookup("static-bg-image"))
 	_ = viper.BindPFlag("no-scaled-thumbs", rootCmd.PersistentFlags().Lookup("no-scaled-thumbs"))
 	_ = viper.BindPFlag("no-scaled-previews", rootCmd.PersistentFlags().Lookup("no-scaled-previews"))
 
