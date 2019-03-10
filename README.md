@@ -25,14 +25,14 @@ web ui ...
 
 ## todo
 
+- [ ] originals/ links broken in static album builds
 - [ ] tests...?!!!
 - [ ] gui help / kbd shortcut info
-- [ ] exclude dotfiles in scanner
 - [ ] Dockerfile, allows thumbs/preview/assets mounts!
 - [ ] cmdline/config options:
   - [ ] serve --no-thumbs, --no-previews, --no-cache
   - [ ] foo
-- [ ] mobile view?
+- [ ] mobile view/test?
 - [ ] make templates exportable (doc-only? build does...)
 - [ ] enable custom templates
 - [ ] autoplay feature (dropdown: whole album, current folder, folder+subfolders; delay in s)
