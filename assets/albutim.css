@@ -31,19 +31,32 @@ img {
     /*border-style: dashed;*/
 }
 
-h1 {
+h1 /* albumtitle + path */ {
 	font-size: 1.8em;
 	font-weight: bold;
 	margin: 10px;
 	letter-spacing: 4px;
 }
 
-h2 {
+h2 /* tagline/subtitle */ {
 	font-size: 1.2em;
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 4px;
 	margin: 10px;
+}
+
+h3 /* help/about */ {
+  font-size: 1.4em;
+  font-weight: bold;
+  letter-spacing: 4px;
+  margin-top:10px;
+  margin: 10px;
+  margin-left:0;
+}
+
+h3 .spot {
+  color: firebrick;
 }
 
 p {	margin: 0; }
@@ -222,6 +235,90 @@ h2 {
   display: none;
   padding-left: 25px;
 }
+
+#help-container {
+  display: none;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#help-container ul {
+  list-style-type: none;
+  padding:0;
+}
+#help-container ul li {
+  margin-bottom: 5px;
+}
+#help-container ul li span {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+.modal-content {
+  border:1px solid black;
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 300px; /* Could be more or less, depending on screen size */
+}
+
+.modal-content p {
+  margin-top: 0px;
+}
+
+.modal-content a {
+  color: firebrick;
+}
+
+.modal-content h4 {
+  color:black;
+  margin-bottom: 10px;
+}
+
+kbd {
+  /* http://www.jimmyscode.com/css-styling-for-kbd-tags/ */
+  padding:0.1em 0.6em;
+  border:1px solid #ccc;
+  font-size:11px;
+  font-family:Arial,Helvetica,sans-serif;
+  background-color:#f7f7f7;
+  color:#333;
+  -moz-box-shadow:0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -webkit-box-shadow:0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  box-shadow:0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  border-radius:3px;
+  display:inline-block;
+  margin:0 0.1em;
+  text-shadow:0 1px 0 #fff;
+  line-height:1.4;
+  white-space:nowrap;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 
 dl {
   font-size:0.8em;

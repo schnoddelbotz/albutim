@@ -26,6 +26,7 @@ var serveCmd = &cobra.Command{
 		album := &lib.Album{
 			SubTitle:         "all the fun pics!",
 			RootPath:         albumRoot,
+			AlbutimVersion:   AppVersion,
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),

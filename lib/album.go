@@ -22,6 +22,7 @@ type Album struct {
 	RootPath         string `json:"-"`
 	Data             *Node  `json:"data"`
 	ServeStatically  bool   `json:"serveStatically"`
+	AlbutimVersion   string `json:"albutimVersion"`
 	NoScaledThumbs   bool   `json:"-"`
 	NoScaledPreviews bool   `json:"-"`
 	NoCacheScaled    bool   `json:"-"`

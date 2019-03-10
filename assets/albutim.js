@@ -8,6 +8,7 @@ var VIEWMODE_IMAGE = 1;  /* const, it is... */
 var currentView = VIEWMODE_FOLDER;
 var currentFolder = "/";
 var showImageInfo = false;
+var showHelp = false;
 var runningFullScreen = false;
 
 $(function () {
@@ -27,7 +28,8 @@ $(function () {
 });
 
 $(document).keydown(function (event) {
-  var interestedIn = [13, 27, 37, 38, 39, 70, 73, 83];
+  console.log(event.which);
+  var interestedIn = [13, 27, 37, 38, 39, 70, 72, 73, 83];
   var key = event.which;
   if (interestedIn.indexOf(key) != -1) {
     event.preventDefault();
@@ -68,10 +70,17 @@ $(document).keydown(function (event) {
         }
         break;
       case 27: // esc
-        showFolder('/');
+          if (showHelp) {
+            toggleHelp();
+          } else {
+            showFolder('/');
+          }
         break;
       case 70: // f
         toggleFullScreen();
+        break;
+      case 72: // h
+        toggleHelp();
         break;
       case 83: // s
         console.log('tbd: unhide search/filter form');
@@ -109,6 +118,17 @@ function initAlbum() {
       $("#image-info").show();
       showImageInfo = true;
     }
+  });
+  $("#help-container").click(function () {
+    toggleHelp();
+  }).children().click(function(e) {
+    return false;
+  });;
+  $("#help-button").click(function () {
+    toggleHelp();
+  });
+  $(".close").click(function () {
+    toggleHelp();
   });
 }
 
@@ -352,6 +372,11 @@ function show404(type, path) {
   $("#subHeader").html(
       '<span style="color:red">' + type + ' ' + path + ' not found!'
       + "</span>");
+}
+
+function toggleHelp() {
+  showHelp = !showHelp;
+  $("#help-container").toggle();
 }
 
 /****************** helper functions below ***********************************/

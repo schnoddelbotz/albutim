@@ -27,12 +27,11 @@
   <div class="clearer"></div>
   <!-- Container used for single image / preview display -->
   <div id="single-image-container">
-   <!--<div class="center" style="">-->
       <a id="single-image-link" href="#">
         <img id="single-image" class="border" src="#" alt="Preview" title="Click for original">
       </a>
-   <!--</div>-->
   </div>
+  <!-- Container used for thumb/folder browser display -->
 	<div id="content" class="content">
     <!-- PREVIOUS / NEXT -->
     <div id="stepnav-thumb-container">
@@ -90,10 +89,38 @@
 			</div>
     </div>
 	</div>
+  <!-- Container for modal help / about screen -->
+  <div id="help-container">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>albu<span class="spot">ti</span>m</h3>
+      <h4>album data</h4>
+      <ul>
+        <li><span>title</span>{{.Title}}</li>
+        <li><span>built</span>{{.CreatedAt}}</li>
+      </ul>
+      <h4>keyboard shortcuts</h4>
+      <ul>
+        <li><kbd>esc</kbd>ape help, folder, ...</li>
+        <li><kbd>h</kbd>elp - toggle this window</li>
+        <li><kbd>f</kbd>ullscreen</li>
+        <li><kbd>⇧</kbd> folder up</li>
+        <li><kbd>⇦</kbd> previous image</li>
+        <li><kbd>⇨</kbd> next image</li>
+        <li><kbd>i</kbd>mage EXIF info on|off</li>
+      </ul>
+      <h4>about albutim</h4>
+      <p>
+        Version {{.AlbutimVersion}}<br>
+        <a href="https://github.com/schnoddelbotz/albutim">On Github</a>
+      </p>
+    </div>
+  </div>
   <div class="clearer"></div>
+  <!-- -->
   <div id="footer" class="border">
 			<p>
-        <a id="help-button">keyboard shortcuts</a> |
+        <a id="help-button">help</a> |
         <a id="info-button">image information |</a> album made with
         <a href="https://github.com/schnoddelbotz/albutim" title="albutim 0">albutim</a>
       </p>
