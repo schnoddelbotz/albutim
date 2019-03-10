@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/schnoddelbotz/albutim/lib"
 
@@ -36,6 +37,7 @@ albutim --root my-images build --output my-album`,
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
 			ServeStatically:  true,
 			AlbutimVersion:   AppVersion,
+			CreatedAt:        time.Now().String(),
 			NumThreads:       threads}
 
 		var e error

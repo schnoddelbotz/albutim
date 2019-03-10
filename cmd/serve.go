@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/schnoddelbotz/albutim/lib"
 
@@ -27,6 +28,7 @@ var serveCmd = &cobra.Command{
 			SubTitle:         "all the fun pics!",
 			RootPath:         albumRoot,
 			AlbutimVersion:   AppVersion,
+			CreatedAt:        time.Now().String(),
 			Title:            viper.GetString("title"),
 			NoScaledPreviews: viper.GetBool("no-scaled-previews"),
 			NoScaledThumbs:   viper.GetBool("no-scaled-thumbs"),
