@@ -25,7 +25,8 @@ web ui ...
 
 ## todo
 
-- [ ] 
+- [ ] add zap all text fullscreenPro option
+- [ ] add search/filter
 - [ ] /index.html and /albumdata.js in <- there .data
 - [ ] build cmd does not overwrite existing assets!
 - [ ] originals/ links broken in static album builds
