@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type Album struct {
@@ -62,7 +63,6 @@ type Node struct {
 
 func BuildAlbum(a Album) {
 	log.Printf("Building Album '%s'", a.Title)
-
 	if !a.NoScaledPreviews || !a.NoScaledThumbs {
 		a.buildThumbsAndPreviews()
 	}
@@ -103,6 +103,9 @@ func writeAlbumDataJS(a Album, err error, outFile string) error {
 
 func ScanDir(root string, a *Album) (result *Node, err error) {
 	log.Printf("Reading images in %s ...", root)
+	var mutex = &sync.Mutex{}
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 128) // max 128 open files for exif reading
 	parents := make(map[string]*Node)
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -118,6 +121,8 @@ func ScanDir(root string, a *Album) (result *Node, err error) {
 			// skip folder created by us
 			return nil
 		}
+
+		mutex.Lock()
 		parents[path] = &Node{
 			FullPath: strings.TrimPrefix(path, root),
 			WebPath:  filepath.ToSlash(strings.TrimPrefix(path, root)),
@@ -127,18 +132,31 @@ func ScanDir(root string, a *Album) (result *Node, err error) {
 			Album:    a,
 			Children: make([]*Node, 0),
 		}
+		mutex.Unlock()
+
 		if !info.IsDir() && isImage(path) {
-			parents[path].IsImage = true
-			ed, err := getExif(path)
-			if err == nil {
-				parents[path].ExifData = ed
-			}
+			wg.Add(1)
+			go func() {
+				sem <- struct{}{}
+				defer func() { <-sem }()
+				defer wg.Done()
+				ed, err := getExif(path)
+				mutex.Lock()
+				if err == nil {
+					parents[path].ExifData = ed
+				}
+				parents[path].IsImage = true
+				mutex.Unlock()
+			}()
 		}
+
 		return nil
 	}
 	if err = filepath.Walk(root, walkFunc); err != nil {
 		return
 	}
+	wg.Wait()
+	close(sem)
 	for path, node := range parents {
 		parentPath := filepath.Dir(path)
 		parent, exists := parents[parentPath]
