@@ -16,3 +16,5 @@ albutim
 lib/assets.go
 .idea/
 testalbum/
+albutim_*
+testalbum.zip

@@ -28,7 +28,7 @@ $(function () {
 });
 
 $(document).keydown(function (event) {
-  console.log(event.which);
+  //console.log(event.which);
   var interestedIn = [13, 27, 37, 38, 39, 70, 72, 73, 83];
   var key = event.which;
   if (interestedIn.indexOf(key) != -1) {
@@ -313,7 +313,7 @@ function showImage(folder, image) {
   if (frontImageUrl.match(/.gif$/i)) {
     frontImageUrl = 'original' + folder + image;
   }
-  $("#single-image-link").attr('href', 'originals' + folder + image);
+  $("#single-image-link").attr('href', (serveStatically?'.':'originals') + folder + image);
 
   // set background image = current image; fades via css3 transition
   $("#background-image").css('background-image',
